@@ -6,28 +6,27 @@ namespace CineVault.Application.Users.RegisterUser;
 
 public class RegisterUserUseCase
 {
-    private readonly IUserRepository _users;
-    private readonly IPasswordHasher _hasher;
+    private readonly IUserRepository _usersRepository;
+    private readonly IPasswordHasher _passwordHasher;
 
     public RegisterUserUseCase(IUserRepository users, IPasswordHasher hasher)
     {
-        _users = users;
-        _hasher = hasher;
+        _usersRepository = users;
+        _passwordHasher = hasher;
     }
 
-    public async Task<Result<RegisterUserResult>> Execute(
-        RegisterUserCommand command, CancellationToken ct = default)
+    public async Task<Result<RegisterUserResult>> Execute(RegisterUserCommand command)
     {
-        if (await _users.ExistsByEmailAsync(command.Email, ct))
+        if (await _usersRepository.ExistsByEmailAsync(command.Email))
         {
             return Result<RegisterUserResult>.Failure(
                 new Error(ErrorType.Conflict, "user.email_taken", "Email is already registered."));
         }
 
-        var passwordHash = _hasher.Hash(command.Password);
+        var passwordHash = _passwordHasher.Hash(command.Password);
         var user = User.Create(command.Name, command.Email, passwordHash);
 
-        await _users.AddAsync(user, ct);
+        await _usersRepository.AddAsync(user);
 
         return Result<RegisterUserResult>.Success(new RegisterUserResult(user.Id));
     }

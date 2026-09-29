@@ -4,7 +4,9 @@ namespace CineVault.Application.Abstractions;
 
 public interface IUserRepository
 {
-    Task<bool> ExistsByEmailAsync(string email, CancellationToken ct = default);
+    Task<bool> ExistsByEmailAsync(string email);
 
-    Task AddAsync(User user, CancellationToken ct = default);
+    Task<User?> GetByEmailAsync(string email);
+
+    Task AddAsync(User user);
 }

@@ -13,7 +13,7 @@ public class MovieReviewRepositoryTests : RepositoryTestBase
         var user = User.Create("Jane", email, "hash");
         var movie = Movie.Create("The Matrix", null);
 
-        await using var context = CreateContext();
+        var context = CreateContext();
         context.Users.Add(user);
         context.Movies.Add(movie);
         await context.SaveChangesAsync();
@@ -27,13 +27,9 @@ public class MovieReviewRepositoryTests : RepositoryTestBase
         var (userId, movieId) = await SeedUserAndMovieAsync();
         var review = MovieReview.Create(userId, movieId, 8);
 
-        await using (var context = CreateContext())
-        {
-            await new MovieReviewRepository(context).AddAsync(review);
-        }
+        await new MovieReviewRepository(CreateContext()).AddAsync(review);
 
-        await using var read = CreateContext();
-        var found = await read.MovieReviews.FindAsync(review.Id);
+        var found = await CreateContext().MovieReviews.FindAsync(review.Id);
         found.Should().NotBeNull();
         found!.Rating.Should().Be(8);
     }
@@ -42,13 +38,9 @@ public class MovieReviewRepositoryTests : RepositoryTestBase
     public async Task ExistsByUserAndMovieAsync_WhenExists_ReturnsTrue()
     {
         var (userId, movieId) = await SeedUserAndMovieAsync();
-        await using (var context = CreateContext())
-        {
-            await new MovieReviewRepository(context).AddAsync(MovieReview.Create(userId, movieId, 8));
-        }
+        await new MovieReviewRepository(CreateContext()).AddAsync(MovieReview.Create(userId, movieId, 8));
 
-        await using var read = CreateContext();
-        var exists = await new MovieReviewRepository(read).ExistsByUserAndMovieAsync(userId, movieId);
+        var exists = await new MovieReviewRepository(CreateContext()).ExistsByUserAndMovieAsync(userId, movieId);
 
         exists.Should().BeTrue();
     }
@@ -58,13 +50,9 @@ public class MovieReviewRepositoryTests : RepositoryTestBase
     {
         var (userId, movieId) = await SeedUserAndMovieAsync();
         var review = MovieReview.Create(userId, movieId, 8);
-        await using (var context = CreateContext())
-        {
-            await new MovieReviewRepository(context).AddAsync(review);
-        }
+        await new MovieReviewRepository(CreateContext()).AddAsync(review);
 
-        await using var read = CreateContext();
-        var found = await new MovieReviewRepository(read).GetByIdAsync(review.Id);
+        var found = await new MovieReviewRepository(CreateContext()).GetByIdAsync(review.Id);
 
         found.Should().NotBeNull();
         found!.UserId.Should().Be(userId);
@@ -77,15 +65,11 @@ public class MovieReviewRepositoryTests : RepositoryTestBase
         var (userId, movieId) = await SeedUserAndMovieAsync("jane@email.com");
         var (otherUserId, otherMovieId) = await SeedUserAndMovieAsync("john@email.com");
 
-        await using (var context = CreateContext())
-        {
-            var repository = new MovieReviewRepository(context);
-            await repository.AddAsync(MovieReview.Create(userId, movieId, 8));
-            await repository.AddAsync(MovieReview.Create(otherUserId, otherMovieId, 5));
-        }
+        var repository = new MovieReviewRepository(CreateContext());
+        await repository.AddAsync(MovieReview.Create(userId, movieId, 8));
+        await repository.AddAsync(MovieReview.Create(otherUserId, otherMovieId, 5));
 
-        await using var read = CreateContext();
-        var reviews = await new MovieReviewRepository(read).GetByUserAsync(userId);
+        var reviews = await new MovieReviewRepository(CreateContext()).GetByUserAsync(userId);
 
         reviews.Should().ContainSingle();
         reviews[0].UserId.Should().Be(userId);
@@ -96,21 +80,14 @@ public class MovieReviewRepositoryTests : RepositoryTestBase
     {
         var (userId, movieId) = await SeedUserAndMovieAsync();
         var review = MovieReview.Create(userId, movieId, 5);
-        await using (var context = CreateContext())
-        {
-            await new MovieReviewRepository(context).AddAsync(review);
-        }
+        await new MovieReviewRepository(CreateContext()).AddAsync(review);
 
-        await using (var context = CreateContext())
-        {
-            var repository = new MovieReviewRepository(context);
-            var loaded = await repository.GetByIdAsync(review.Id);
-            loaded!.Rate(9);
-            await repository.UpdateAsync(loaded);
-        }
+        var updateRepository = new MovieReviewRepository(CreateContext());
+        var loaded = await updateRepository.GetByIdAsync(review.Id);
+        loaded!.Rate(9);
+        await updateRepository.UpdateAsync(loaded);
 
-        await using var read = CreateContext();
-        var updated = await read.MovieReviews.FindAsync(review.Id);
+        var updated = await CreateContext().MovieReviews.FindAsync(review.Id);
         updated!.Rating.Should().Be(9);
     }
 
@@ -119,20 +96,13 @@ public class MovieReviewRepositoryTests : RepositoryTestBase
     {
         var (userId, movieId) = await SeedUserAndMovieAsync();
         var review = MovieReview.Create(userId, movieId, 5);
-        await using (var context = CreateContext())
-        {
-            await new MovieReviewRepository(context).AddAsync(review);
-        }
+        await new MovieReviewRepository(CreateContext()).AddAsync(review);
 
-        await using (var context = CreateContext())
-        {
-            var repository = new MovieReviewRepository(context);
-            var loaded = await repository.GetByIdAsync(review.Id);
-            await repository.DeleteAsync(loaded!);
-        }
+        var deleteRepository = new MovieReviewRepository(CreateContext());
+        var loaded = await deleteRepository.GetByIdAsync(review.Id);
+        await deleteRepository.DeleteAsync(loaded!);
 
-        await using var read = CreateContext();
-        var found = await read.MovieReviews.FindAsync(review.Id);
+        var found = await CreateContext().MovieReviews.FindAsync(review.Id);
         found.Should().BeNull();
     }
 }

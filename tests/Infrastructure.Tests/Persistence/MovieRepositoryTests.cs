@@ -9,14 +9,11 @@ public class MovieRepositoryTests : RepositoryTestBase
     [Fact]
     public async Task GetAllAsync_ReturnsAllMovies()
     {
-        await using (var context = CreateContext())
-        {
-            context.Movies.AddRange(Movie.Create("The Matrix", null), Movie.Create("Inception", null));
-            await context.SaveChangesAsync();
-        }
+        var arrange = CreateContext();
+        arrange.Movies.AddRange(Movie.Create("The Matrix", null), Movie.Create("Inception", null));
+        await arrange.SaveChangesAsync();
 
-        await using var read = CreateContext();
-        var movies = await new MovieRepository(read).GetAllAsync();
+        var movies = await new MovieRepository(CreateContext()).GetAllAsync();
 
         movies.Should().HaveCount(2);
         movies.Select(movie => movie.Title).Should().Contain(new[] { "The Matrix", "Inception" });
@@ -26,14 +23,11 @@ public class MovieRepositoryTests : RepositoryTestBase
     public async Task ExistsByIdAsync_WhenMovieExists_ReturnsTrue()
     {
         var movie = Movie.Create("The Matrix", null);
-        await using (var context = CreateContext())
-        {
-            context.Movies.Add(movie);
-            await context.SaveChangesAsync();
-        }
+        var arrange = CreateContext();
+        arrange.Movies.Add(movie);
+        await arrange.SaveChangesAsync();
 
-        await using var read = CreateContext();
-        var exists = await new MovieRepository(read).ExistsByIdAsync(movie.Id);
+        var exists = await new MovieRepository(CreateContext()).ExistsByIdAsync(movie.Id);
 
         exists.Should().BeTrue();
     }
@@ -41,9 +35,7 @@ public class MovieRepositoryTests : RepositoryTestBase
     [Fact]
     public async Task ExistsByIdAsync_WhenMovieMissing_ReturnsFalse()
     {
-        await using var context = CreateContext();
-
-        var exists = await new MovieRepository(context).ExistsByIdAsync(Guid.NewGuid());
+        var exists = await new MovieRepository(CreateContext()).ExistsByIdAsync(Guid.NewGuid());
 
         exists.Should().BeFalse();
     }

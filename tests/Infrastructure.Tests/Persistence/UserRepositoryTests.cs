@@ -1,7 +1,6 @@
 using CineVault.Domain.Users;
 using CineVault.Infrastructure.Persistence.Repositories;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 
 namespace CineVault.Infrastructure.Tests.Persistence;
 
@@ -11,14 +10,10 @@ public class UserRepositoryTests : RepositoryTestBase
     public async Task AddAsync_PersistsUser()
     {
         var user = User.Create("Jane Doe", "jane@email.com", "hash");
+        await new UserRepository(CreateContext()).AddAsync(user);
 
-        await using (var context = CreateContext())
-        {
-            await new UserRepository(context).AddAsync(user);
-        }
+        var found = await CreateContext().Users.FindAsync(user.Id);
 
-        await using var read = CreateContext();
-        var found = await read.Users.FindAsync(user.Id);
         found.Should().NotBeNull();
         found!.Name.Should().Be("Jane Doe");
         found.Email.Should().Be("jane@email.com");
@@ -27,13 +22,9 @@ public class UserRepositoryTests : RepositoryTestBase
     [Fact]
     public async Task ExistsByEmailAsync_WhenUserExists_ReturnsTrue()
     {
-        await using (var context = CreateContext())
-        {
-            await new UserRepository(context).AddAsync(User.Create("Jane", "jane@email.com", "hash"));
-        }
+        await new UserRepository(CreateContext()).AddAsync(User.Create("Jane", "jane@email.com", "hash"));
 
-        await using var read = CreateContext();
-        var exists = await new UserRepository(read).ExistsByEmailAsync("jane@email.com");
+        var exists = await new UserRepository(CreateContext()).ExistsByEmailAsync("jane@email.com");
 
         exists.Should().BeTrue();
     }
@@ -41,9 +32,7 @@ public class UserRepositoryTests : RepositoryTestBase
     [Fact]
     public async Task ExistsByEmailAsync_WhenNoUser_ReturnsFalse()
     {
-        await using var context = CreateContext();
-
-        var exists = await new UserRepository(context).ExistsByEmailAsync("ghost@email.com");
+        var exists = await new UserRepository(CreateContext()).ExistsByEmailAsync("ghost@email.com");
 
         exists.Should().BeFalse();
     }
@@ -51,13 +40,9 @@ public class UserRepositoryTests : RepositoryTestBase
     [Fact]
     public async Task GetByEmailAsync_ReturnsMatchingUser()
     {
-        await using (var context = CreateContext())
-        {
-            await new UserRepository(context).AddAsync(User.Create("Jane", "jane@email.com", "hash"));
-        }
+        await new UserRepository(CreateContext()).AddAsync(User.Create("Jane", "jane@email.com", "hash"));
 
-        await using var read = CreateContext();
-        var user = await new UserRepository(read).GetByEmailAsync("jane@email.com");
+        var user = await new UserRepository(CreateContext()).GetByEmailAsync("jane@email.com");
 
         user.Should().NotBeNull();
         user!.Name.Should().Be("Jane");

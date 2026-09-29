@@ -8,6 +8,7 @@ public abstract class RepositoryTestBase : IDisposable
 {
     private readonly SqliteConnection _connection;
     private readonly DbContextOptions<CineVaultDbContext> _options;
+    private readonly List<CineVaultDbContext> _contexts = new();
 
     protected RepositoryTestBase()
     {
@@ -18,11 +19,23 @@ public abstract class RepositoryTestBase : IDisposable
             .UseSqlite(_connection)
             .Options;
 
-        using var context = CreateContext();
-        context.Database.EnsureCreated();
+        CreateContext().Database.EnsureCreated();
     }
 
-    protected CineVaultDbContext CreateContext() => new(_options);
+    protected CineVaultDbContext CreateContext()
+    {
+        var context = new CineVaultDbContext(_options);
+        _contexts.Add(context);
+        return context;
+    }
 
-    public void Dispose() => _connection.Dispose();
+    public void Dispose()
+    {
+        foreach (var context in _contexts)
+        {
+            context.Dispose();
+        }
+
+        _connection.Dispose();
+    }
 }

@@ -8,6 +8,10 @@ namespace CineVault.Infrastructure.Tests.Persistence;
 
 public class MovieReviewRepositoryTests : RepositoryTestBase
 {
+    private readonly MovieReviewRepository _repository;
+
+    public MovieReviewRepositoryTests() => _repository = new MovieReviewRepository(CreateContext());
+
     private async Task<(Guid UserId, Guid MovieId)> SeedUserAndMovieAsync(string email = "jane@email.com")
     {
         var user = User.Create("Jane", email, "hash");
@@ -27,7 +31,7 @@ public class MovieReviewRepositoryTests : RepositoryTestBase
         var (userId, movieId) = await SeedUserAndMovieAsync();
         var review = MovieReview.Create(userId, movieId, 8);
 
-        await new MovieReviewRepository(CreateContext()).AddAsync(review);
+        await _repository.AddAsync(review);
 
         var found = await CreateContext().MovieReviews.FindAsync(review.Id);
         found.Should().NotBeNull();
@@ -38,9 +42,9 @@ public class MovieReviewRepositoryTests : RepositoryTestBase
     public async Task ExistsByUserAndMovieAsync_WhenExists_ReturnsTrue()
     {
         var (userId, movieId) = await SeedUserAndMovieAsync();
-        await new MovieReviewRepository(CreateContext()).AddAsync(MovieReview.Create(userId, movieId, 8));
+        await _repository.AddAsync(MovieReview.Create(userId, movieId, 8));
 
-        var exists = await new MovieReviewRepository(CreateContext()).ExistsByUserAndMovieAsync(userId, movieId);
+        var exists = await _repository.ExistsByUserAndMovieAsync(userId, movieId);
 
         exists.Should().BeTrue();
     }
@@ -50,9 +54,9 @@ public class MovieReviewRepositoryTests : RepositoryTestBase
     {
         var (userId, movieId) = await SeedUserAndMovieAsync();
         var review = MovieReview.Create(userId, movieId, 8);
-        await new MovieReviewRepository(CreateContext()).AddAsync(review);
+        await _repository.AddAsync(review);
 
-        var found = await new MovieReviewRepository(CreateContext()).GetByIdAsync(review.Id);
+        var found = await _repository.GetByIdAsync(review.Id);
 
         found.Should().NotBeNull();
         found!.UserId.Should().Be(userId);
@@ -64,12 +68,10 @@ public class MovieReviewRepositoryTests : RepositoryTestBase
     {
         var (userId, movieId) = await SeedUserAndMovieAsync("jane@email.com");
         var (otherUserId, otherMovieId) = await SeedUserAndMovieAsync("john@email.com");
+        await _repository.AddAsync(MovieReview.Create(userId, movieId, 8));
+        await _repository.AddAsync(MovieReview.Create(otherUserId, otherMovieId, 5));
 
-        var repository = new MovieReviewRepository(CreateContext());
-        await repository.AddAsync(MovieReview.Create(userId, movieId, 8));
-        await repository.AddAsync(MovieReview.Create(otherUserId, otherMovieId, 5));
-
-        var reviews = await new MovieReviewRepository(CreateContext()).GetByUserAsync(userId);
+        var reviews = await _repository.GetByUserAsync(userId);
 
         reviews.Should().ContainSingle();
         reviews[0].UserId.Should().Be(userId);
@@ -80,12 +82,11 @@ public class MovieReviewRepositoryTests : RepositoryTestBase
     {
         var (userId, movieId) = await SeedUserAndMovieAsync();
         var review = MovieReview.Create(userId, movieId, 5);
-        await new MovieReviewRepository(CreateContext()).AddAsync(review);
+        await _repository.AddAsync(review);
 
-        var updateRepository = new MovieReviewRepository(CreateContext());
-        var loaded = await updateRepository.GetByIdAsync(review.Id);
+        var loaded = await _repository.GetByIdAsync(review.Id);
         loaded!.Rate(9);
-        await updateRepository.UpdateAsync(loaded);
+        await _repository.UpdateAsync(loaded);
 
         var updated = await CreateContext().MovieReviews.FindAsync(review.Id);
         updated!.Rating.Should().Be(9);
@@ -96,11 +97,10 @@ public class MovieReviewRepositoryTests : RepositoryTestBase
     {
         var (userId, movieId) = await SeedUserAndMovieAsync();
         var review = MovieReview.Create(userId, movieId, 5);
-        await new MovieReviewRepository(CreateContext()).AddAsync(review);
+        await _repository.AddAsync(review);
 
-        var deleteRepository = new MovieReviewRepository(CreateContext());
-        var loaded = await deleteRepository.GetByIdAsync(review.Id);
-        await deleteRepository.DeleteAsync(loaded!);
+        var loaded = await _repository.GetByIdAsync(review.Id);
+        await _repository.DeleteAsync(loaded!);
 
         var found = await CreateContext().MovieReviews.FindAsync(review.Id);
         found.Should().BeNull();

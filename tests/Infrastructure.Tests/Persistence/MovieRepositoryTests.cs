@@ -6,6 +6,10 @@ namespace CineVault.Infrastructure.Tests.Persistence;
 
 public class MovieRepositoryTests : RepositoryTestBase
 {
+    private readonly MovieRepository _repository;
+
+    public MovieRepositoryTests() => _repository = new MovieRepository(CreateContext());
+
     [Fact]
     public async Task GetAllAsync_ReturnsAllMovies()
     {
@@ -13,7 +17,7 @@ public class MovieRepositoryTests : RepositoryTestBase
         arrange.Movies.AddRange(Movie.Create("The Matrix", null), Movie.Create("Inception", null));
         await arrange.SaveChangesAsync();
 
-        var movies = await new MovieRepository(CreateContext()).GetAllAsync();
+        var movies = await _repository.GetAllAsync();
 
         movies.Should().HaveCount(2);
         movies.Select(movie => movie.Title).Should().Contain(new[] { "The Matrix", "Inception" });
@@ -27,7 +31,7 @@ public class MovieRepositoryTests : RepositoryTestBase
         arrange.Movies.Add(movie);
         await arrange.SaveChangesAsync();
 
-        var exists = await new MovieRepository(CreateContext()).ExistsByIdAsync(movie.Id);
+        var exists = await _repository.ExistsByIdAsync(movie.Id);
 
         exists.Should().BeTrue();
     }
@@ -35,7 +39,7 @@ public class MovieRepositoryTests : RepositoryTestBase
     [Fact]
     public async Task ExistsByIdAsync_WhenMovieMissing_ReturnsFalse()
     {
-        var exists = await new MovieRepository(CreateContext()).ExistsByIdAsync(Guid.NewGuid());
+        var exists = await _repository.ExistsByIdAsync(Guid.NewGuid());
 
         exists.Should().BeFalse();
     }

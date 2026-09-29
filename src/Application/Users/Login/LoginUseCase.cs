@@ -9,11 +9,11 @@ public class LoginUseCase
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
 
-    public LoginUseCase(IUserRepository users, IPasswordHasher hasher, ITokenService tokens)
+    public LoginUseCase(IUserRepository usersRepository, IPasswordHasher passwordHasher, ITokenService tokenService)
     {
-        _usersRepository = users;
-        _passwordHasher = hasher;
-        _tokenService = tokens;
+        _usersRepository = usersRepository;
+        _passwordHasher = passwordHasher;
+        _tokenService = tokenService;
     }
 
     public async Task<Result<LoginResult>> Execute(LoginCommand command)

@@ -9,10 +9,10 @@ public class RegisterUserUseCase
     private readonly IUserRepository _usersRepository;
     private readonly IPasswordHasher _passwordHasher;
 
-    public RegisterUserUseCase(IUserRepository users, IPasswordHasher hasher)
+    public RegisterUserUseCase(IUserRepository usersRepository, IPasswordHasher passwordHasher)
     {
-        _usersRepository = users;
-        _passwordHasher = hasher;
+        _usersRepository = usersRepository;
+        _passwordHasher = passwordHasher;
     }
 
     public async Task<Result<RegisterUserResult>> Execute(RegisterUserCommand command)

@@ -8,6 +8,8 @@ public interface IMovieReviewRepository
 
     Task<MovieReview?> GetByIdAsync(Guid id);
 
+    Task<IReadOnlyList<MovieReview>> GetByUserAsync(Guid userId);
+
     Task AddAsync(MovieReview movieReview);
 
     Task UpdateAsync(MovieReview movieReview);

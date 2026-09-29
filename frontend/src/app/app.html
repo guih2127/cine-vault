@@ -1,0 +1,14 @@
+<mat-toolbar color="primary">
+  <span>🎬 CineVault</span>
+  <span class="spacer"></span>
+  @if (authService.isAuthenticated()) {
+    <button mat-button (click)="authService.logout()">
+      <mat-icon>logout</mat-icon>
+      Logout
+    </button>
+  }
+</mat-toolbar>
+
+<main>
+  <router-outlet />
+</main>

@@ -1,0 +1,6 @@
+@CineVault.Api_HostAddress = http://localhost:5055
+
+GET {{CineVault.Api_HostAddress}}/health
+Accept: application/json
+
+###

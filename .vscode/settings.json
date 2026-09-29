@@ -1,0 +1,11 @@
+{
+  "files.exclude": {
+    "**/bin": true,
+    "**/obj": true
+  },
+  "dotnet.defaultSolution": "CineVault.sln",
+  "search.exclude": {
+    "**/bin": true,
+    "**/obj": true
+  }
+}

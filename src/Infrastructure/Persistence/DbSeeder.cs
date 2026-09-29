@@ -16,11 +16,11 @@ public static class DbSeeder
         if (!await dbContext.Movies.AnyAsync())
         {
             dbContext.Movies.AddRange(
-                Movie.Create("The Matrix", "https://placehold.co/300x450?text=The+Matrix"),
-                Movie.Create("Inception", "https://placehold.co/300x450?text=Inception"),
-                Movie.Create("The Godfather", "https://placehold.co/300x450?text=The+Godfather"),
-                Movie.Create("Pulp Fiction", "https://placehold.co/300x450?text=Pulp+Fiction"),
-                Movie.Create("Interstellar", "https://placehold.co/300x450?text=Interstellar"));
+                Movie.Create("The Matrix", 1999, "https://image.tmdb.org/t/p/w500/lDqMDI3xpbB9UQRyeXfei0MXhqb.jpg"),
+                Movie.Create("Inception", 2010, "https://image.tmdb.org/t/p/w500/9e3Dz7aCANy5aRUQF745IlNloJ1.jpg"),
+                Movie.Create("The Godfather", 1972, "https://image.tmdb.org/t/p/w500/wOMxE93W6KcZTuCeNUByNTSaLLt.jpg"),
+                Movie.Create("Pulp Fiction", 1994, "https://image.tmdb.org/t/p/w500/tptjnB2LDbuUWya9Cx5sQtv5hqb.jpg"),
+                Movie.Create("Interstellar", 2014, "https://image.tmdb.org/t/p/w500/tR1XVa5bxgdh2bRw2u0DzrgkO2l.jpg"));
         }
 
         if (!await dbContext.Users.AnyAsync())

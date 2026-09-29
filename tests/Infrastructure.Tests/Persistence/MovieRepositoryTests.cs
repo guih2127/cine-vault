@@ -14,7 +14,7 @@ public class MovieRepositoryTests : RepositoryTestBase
     public async Task GetAllAsync_ReturnsAllMovies()
     {
         var arrange = CreateContext();
-        arrange.Movies.AddRange(Movie.Create("The Matrix", null), Movie.Create("Inception", null));
+        arrange.Movies.AddRange(Movie.Create("The Matrix", 1999, null), Movie.Create("Inception", 2010, null));
         await arrange.SaveChangesAsync();
 
         var movies = await _repository.GetAllAsync();
@@ -26,7 +26,7 @@ public class MovieRepositoryTests : RepositoryTestBase
     [Fact]
     public async Task ExistsByIdAsync_WhenMovieExists_ReturnsTrue()
     {
-        var movie = Movie.Create("The Matrix", null);
+        var movie = Movie.Create("The Matrix", 1999, null);
         var arrange = CreateContext();
         arrange.Movies.Add(movie);
         await arrange.SaveChangesAsync();

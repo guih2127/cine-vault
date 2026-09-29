@@ -17,16 +17,16 @@ public class ListMoviesUseCaseTests
     [Fact]
     public async Task Execute_ReturnsAllMoviesMappedToResponse()
     {
-        var matrix = Movie.Create("The Matrix", "https://posters/matrix.jpg");
-        var inception = Movie.Create("Inception", null);
+        var matrix = Movie.Create("The Matrix", 1999, "https://posters/matrix.jpg");
+        var inception = Movie.Create("Inception", 2010, null);
         _movieRepository.Setup(r => r.GetAllAsync())
             .ReturnsAsync(new List<Movie> { matrix, inception });
 
         var result = await _useCase.Execute();
 
         result.Should().HaveCount(2);
-        result.Should().ContainEquivalentOf(new MovieResponse(matrix.Id, "The Matrix", "https://posters/matrix.jpg"));
-        result.Should().ContainEquivalentOf(new MovieResponse(inception.Id, "Inception", null));
+        result.Should().ContainEquivalentOf(new MovieResponse(matrix.Id, "The Matrix", 1999, "https://posters/matrix.jpg"));
+        result.Should().ContainEquivalentOf(new MovieResponse(inception.Id, "Inception", 2010, null));
     }
 
     [Fact]

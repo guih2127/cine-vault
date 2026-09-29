@@ -15,7 +15,7 @@ public class MovieReviewRepositoryTests : RepositoryTestBase
     private async Task<(Guid UserId, Guid MovieId)> SeedUserAndMovieAsync(string email = "jane@email.com")
     {
         var user = User.Create("Jane", email, "hash");
-        var movie = Movie.Create("The Matrix", null);
+        var movie = Movie.Create("The Matrix", 1999, null);
 
         var context = CreateContext();
         context.Users.Add(user);

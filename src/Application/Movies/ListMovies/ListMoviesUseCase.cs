@@ -16,7 +16,7 @@ public class ListMoviesUseCase
         var movies = await _movieRepository.GetAllAsync();
 
         return movies
-            .Select(movie => new MovieResponse(movie.Id, movie.Title, movie.PosterUrl))
+            .Select(movie => new MovieResponse(movie.Id, movie.Title, movie.Year, movie.PosterUrl))
             .ToList();
     }
 }

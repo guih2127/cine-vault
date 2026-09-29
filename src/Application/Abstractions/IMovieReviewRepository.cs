@@ -11,4 +11,6 @@ public interface IMovieReviewRepository
     Task AddAsync(MovieReview movieReview);
 
     Task UpdateAsync(MovieReview movieReview);
+
+    Task DeleteAsync(MovieReview movieReview);
 }

@@ -1,10 +1,10 @@
-using CineVault.Domain.UserMovies;
+using CineVault.Domain.MovieReviews;
 
 namespace CineVault.Application.Abstractions;
 
-public interface IUserMovieRepository
+public interface IMovieReviewRepository
 {
     Task<bool> ExistsByUserAndMovieAsync(Guid userId, Guid movieId);
 
-    Task AddAsync(UserMovie userMovie);
+    Task AddAsync(MovieReview movieReview);
 }

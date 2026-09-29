@@ -1,8 +1,8 @@
 using CineVault.Domain.Shared;
 
-namespace CineVault.Domain.UserMovies;
+namespace CineVault.Domain.MovieReviews;
 
-public class UserMovie
+public class MovieReview
 {
     public const int MinRating = 0;
     public const int MaxRating = 10;
@@ -12,7 +12,7 @@ public class UserMovie
     public Guid MovieId { get; private set; }
     public int? Rating { get; private set; }
 
-    private UserMovie(Guid id, Guid userId, Guid movieId, int? rating)
+    private MovieReview(Guid id, Guid userId, Guid movieId, int? rating)
     {
         Id = id;
         UserId = userId;
@@ -20,7 +20,7 @@ public class UserMovie
         Rating = rating;
     }
 
-    public static UserMovie Create(Guid userId, Guid movieId, int? rating = null)
+    public static MovieReview Create(Guid userId, Guid movieId, int? rating = null)
     {
         if (userId == Guid.Empty)
         {
@@ -37,7 +37,7 @@ public class UserMovie
             EnsureValidRating(rating.Value);
         }
 
-        return new UserMovie(Guid.NewGuid(), userId, movieId, rating);
+        return new MovieReview(Guid.NewGuid(), userId, movieId, rating);
     }
 
     public void Rate(int rating)

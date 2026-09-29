@@ -9,9 +9,10 @@ public class UserTests
     [Fact]
     public void Create_WithValidData_ReturnsUser()
     {
-        var user = User.Create("Test@Email.com", "hashed-password");
+        var user = User.Create("  Jane Doe  ", "Test@Email.com", "hashed-password");
 
         user.Id.Should().NotBeEmpty();
+        user.Name.Should().Be("Jane Doe");
         user.Email.Should().Be("test@email.com");
         user.PasswordHash.Should().Be("hashed-password");
     }
@@ -20,9 +21,20 @@ public class UserTests
     [InlineData("")]
     [InlineData("   ")]
     [InlineData(null)]
+    public void Create_WithEmptyName_ThrowsDomainException(string? invalidName)
+    {
+        var act = () => User.Create(invalidName!, "test@email.com", "hashed-password");
+
+        act.Should().Throw<DomainException>().WithMessage("*name*");
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData(null)]
     public void Create_WithEmptyEmail_ThrowsDomainException(string? invalidEmail)
     {
-        var act = () => User.Create(invalidEmail!, "hashed-password");
+        var act = () => User.Create("Jane Doe", invalidEmail!, "hashed-password");
 
         act.Should().Throw<DomainException>().WithMessage("*email*");
     }
@@ -33,7 +45,7 @@ public class UserTests
     [InlineData(null)]
     public void Create_WithEmptyPasswordHash_ThrowsDomainException(string? invalidHash)
     {
-        var act = () => User.Create("test@email.com", invalidHash!);
+        var act = () => User.Create("Jane Doe", "test@email.com", invalidHash!);
 
         act.Should().Throw<DomainException>().WithMessage("*password*");
     }

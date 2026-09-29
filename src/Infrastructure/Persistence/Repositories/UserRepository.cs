@@ -14,22 +14,14 @@ public class UserRepository : IUserRepository
     }
 
     public Task<bool> ExistsByEmailAsync(string email)
-    {
-        var normalized = Normalize(email);
-        return _dbContext.Users.AnyAsync(user => user.Email == normalized);
-    }
+        => _dbContext.Users.AnyAsync(user => user.Email == email);
 
     public Task<User?> GetByEmailAsync(string email)
-    {
-        var normalized = Normalize(email);
-        return _dbContext.Users.FirstOrDefaultAsync(user => user.Email == normalized);
-    }
+        => _dbContext.Users.FirstOrDefaultAsync(user => user.Email == email);
 
     public async Task AddAsync(User user)
     {
         _dbContext.Users.Add(user);
         await _dbContext.SaveChangesAsync();
     }
-
-    private static string Normalize(string email) => email.Trim().ToLowerInvariant();
 }

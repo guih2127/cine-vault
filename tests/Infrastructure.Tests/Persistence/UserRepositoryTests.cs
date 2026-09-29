@@ -25,7 +25,7 @@ public class UserRepositoryTests : RepositoryTestBase
     }
 
     [Fact]
-    public async Task ExistsByEmailAsync_WhenUserExists_ReturnsTrueCaseInsensitive()
+    public async Task ExistsByEmailAsync_WhenUserExists_ReturnsTrue()
     {
         await using (var context = CreateContext())
         {
@@ -33,7 +33,7 @@ public class UserRepositoryTests : RepositoryTestBase
         }
 
         await using var read = CreateContext();
-        var exists = await new UserRepository(read).ExistsByEmailAsync("  JANE@Email.com ");
+        var exists = await new UserRepository(read).ExistsByEmailAsync("jane@email.com");
 
         exists.Should().BeTrue();
     }

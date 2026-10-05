@@ -58,6 +58,10 @@ dotnet run --project src/Api
 - On startup it **applies EF migrations and seeds** the SQLite database automatically — no manual DB setup.
 - Interactive API docs (Scalar) at **http://localhost:5055/scalar**.
 
+> **Hot reload (development):** use `dotnet watch --project src/Api` instead — it recompiles
+> and restarts the API automatically on every code change. With plain `dotnet run` you must
+> stop (Ctrl+C) and re-run after each change.
+
 ### 2. Frontend (Angular)
 
 ```bash
@@ -67,6 +71,8 @@ npm start
 ```
 
 - Serves on **http://localhost:4200** and talks to the API at `http://localhost:5055/api`.
+- **Live reload is on by default** — saving a component, template or style refreshes the browser
+  automatically. (Restart `npm start` only after changing `angular.json` or installing packages.)
 
 Open **http://localhost:4200** and sign in.
 

@@ -66,7 +66,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapGet("/health", () => Results.Ok(new { status = "healthy" })).AllowAnonymous();
+var instanceName = builder.Configuration["INSTANCE_NAME"] ?? Environment.MachineName;
+app.MapGet("/health", () => Results.Ok(new { status = "healthy", instance = instanceName })).AllowAnonymous();
 
 await MigrateAndSeedAsync(app);
 

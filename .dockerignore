@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+**/*.db
+**/*.db-shm
+**/*.db-wal
+.git/
+.idea/
+.vscode/
+.claude/
+docs/
+frontend/
+tests/

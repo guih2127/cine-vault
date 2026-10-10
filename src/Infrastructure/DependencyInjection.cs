@@ -1,4 +1,5 @@
 using CineVault.Application.Abstractions;
+using CineVault.Infrastructure.Caching;
 using CineVault.Infrastructure.Persistence;
 using CineVault.Infrastructure.Persistence.Repositories;
 using CineVault.Infrastructure.Security;
@@ -18,6 +19,9 @@ public static class DependencyInjection
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IMovieRepository, MovieRepository>();
         services.AddScoped<IMovieReviewRepository, MovieReviewRepository>();
+
+        services.AddMemoryCache();
+        services.AddSingleton<IMovieCache, MemoryMovieCache>();
 
         services.AddSingleton<IPasswordHasher, PasswordHasherAdapter>();
 

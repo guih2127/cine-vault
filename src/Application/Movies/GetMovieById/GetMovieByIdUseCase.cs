@@ -7,14 +7,23 @@ namespace CineVault.Application.Movies.GetMovieById;
 public class GetMovieByIdUseCase
 {
     private readonly IMovieRepository _movieRepository;
+    private readonly IMovieCache _movieCache;
 
-    public GetMovieByIdUseCase(IMovieRepository movieRepository)
+    public GetMovieByIdUseCase(IMovieRepository movieRepository, IMovieCache movieCache)
     {
         _movieRepository = movieRepository;
+        _movieCache = movieCache;
     }
 
     public async Task<Result<MovieResponse>> Execute(GetMovieByIdQuery query)
     {
+        var cached = await _movieCache.GetAsync(query.MovieId);
+
+        if (cached is not null)
+        {
+            return Result<MovieResponse>.Success(cached);
+        }
+
         var movie = await _movieRepository.GetByIdAsync(query.MovieId);
 
         if (movie is null)
@@ -23,7 +32,9 @@ public class GetMovieByIdUseCase
                 new Error(ErrorType.NotFound, "movie.not_found", "Movie not found."));
         }
 
-        return Result<MovieResponse>.Success(
-            new MovieResponse(movie.Id, movie.Title, movie.Year, movie.PosterUrl));
+        var response = new MovieResponse(movie.Id, movie.Title, movie.Year, movie.PosterUrl);
+        await _movieCache.SetAsync(response);
+
+        return Result<MovieResponse>.Success(response);
     }
 }

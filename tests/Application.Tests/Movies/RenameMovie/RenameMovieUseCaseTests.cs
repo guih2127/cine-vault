@@ -11,10 +11,11 @@ namespace CineVault.Application.Tests.Movies.RenameMovie;
 public class RenameMovieUseCaseTests
 {
     private readonly Mock<IMovieRepository> _movieRepository = new();
+    private readonly Mock<IMovieCache> _movieCache = new();
     private readonly RenameMovieUseCase _useCase;
 
     public RenameMovieUseCaseTests()
-        => _useCase = new RenameMovieUseCase(_movieRepository.Object);
+        => _useCase = new RenameMovieUseCase(_movieRepository.Object, _movieCache.Object);
 
     [Fact]
     public async Task Execute_WithUnknownMovie_ReturnsNotFoundAndDoesNotPersist()
@@ -27,6 +28,7 @@ public class RenameMovieUseCaseTests
         result.IsSuccess.Should().BeFalse();
         result.Error!.Type.Should().Be(ErrorType.NotFound);
         _movieRepository.Verify(r => r.UpdateAsync(It.IsAny<Movie>()), Times.Never);
+        _movieCache.Verify(c => c.RemoveAsync(It.IsAny<Guid>()), Times.Never);
     }
 
     [Fact]
@@ -39,10 +41,11 @@ public class RenameMovieUseCaseTests
 
         await act.Should().ThrowAsync<DomainException>();
         _movieRepository.Verify(r => r.UpdateAsync(It.IsAny<Movie>()), Times.Never);
+        _movieCache.Verify(c => c.RemoveAsync(It.IsAny<Guid>()), Times.Never);
     }
 
     [Fact]
-    public async Task Execute_WithValidTitle_RenamesAndPersists()
+    public async Task Execute_WithValidTitle_RenamesPersistsAndInvalidatesCache()
     {
         var movie = Movie.Create("The Matrix", 1999, null);
         _movieRepository.Setup(r => r.GetByIdAsync(movie.Id)).ReturnsAsync(movie);
@@ -52,5 +55,6 @@ public class RenameMovieUseCaseTests
         result.IsSuccess.Should().BeTrue();
         _movieRepository.Verify(r => r.UpdateAsync(
             It.Is<Movie>(m => m.Id == movie.Id && m.Title == "The Matrix Reloaded")), Times.Once);
+        _movieCache.Verify(c => c.RemoveAsync(movie.Id), Times.Once);
     }
 }

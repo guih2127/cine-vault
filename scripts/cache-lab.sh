@@ -31,7 +31,7 @@ echo
 echo "2) Renaming to \"$NEW_TITLE\""
 curl -s -D - -o /dev/null -X PUT "$BASE_URL/api/movies/$MOVIE_ID/title" \
   -H "$AUTH" -H "Content-Type: application/json" -d "{\"title\":\"$NEW_TITLE\"}" | upstream
-echo "  -> PUT handled here, only this replica invalidated its cache"
+echo "  -> PUT handled here (memory cache: only this replica is invalidated; Redis: all of them)"
 echo
 echo "3) Reading again"
 read_movie

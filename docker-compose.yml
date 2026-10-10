@@ -4,11 +4,28 @@ x-api: &api
   restart: unless-stopped
   volumes:
     - cinevault-data:/data
+  depends_on:
+    redis:
+      condition: service_healthy
+
+x-api-environment: &api-environment
+  ConnectionStrings__Redis: redis:6379
 
 services:
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command: redis-server --maxmemory 64mb --maxmemory-policy allkeys-lru --save "" --appendonly no
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
   api1:
     <<: *api
     environment:
+      <<: *api-environment
       INSTANCE_NAME: api1
     healthcheck:
       test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080"]
@@ -19,16 +36,22 @@ services:
   api2:
     <<: *api
     environment:
+      <<: *api-environment
       INSTANCE_NAME: api2
     depends_on:
+      redis:
+        condition: service_healthy
       api1:
         condition: service_healthy
 
   api3:
     <<: *api
     environment:
+      <<: *api-environment
       INSTANCE_NAME: api3
     depends_on:
+      redis:
+        condition: service_healthy
       api1:
         condition: service_healthy
 

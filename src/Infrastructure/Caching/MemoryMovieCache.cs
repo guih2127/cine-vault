@@ -7,8 +7,6 @@ namespace CineVault.Infrastructure.Caching;
 
 public class MemoryMovieCache : IMovieCache
 {
-    private static readonly TimeSpan TimeToLive = TimeSpan.FromMinutes(10);
-
     private readonly IMemoryCache _memoryCache;
     private readonly ILogger<MemoryMovieCache> _logger;
 
@@ -20,7 +18,7 @@ public class MemoryMovieCache : IMovieCache
 
     public Task<MovieResponse?> GetAsync(Guid movieId)
     {
-        var key = KeyFor(movieId);
+        var key = MovieCacheEntry.KeyFor(movieId);
         var found = _memoryCache.TryGetValue(key, out MovieResponse? movie);
 
         _logger.LogInformation("Memory cache {Outcome} for {Key}", found ? "HIT" : "MISS", key);
@@ -30,17 +28,15 @@ public class MemoryMovieCache : IMovieCache
 
     public Task SetAsync(MovieResponse movie)
     {
-        _memoryCache.Set(KeyFor(movie.Id), movie, TimeToLive);
+        _memoryCache.Set(MovieCacheEntry.KeyFor(movie.Id), movie, MovieCacheEntry.TimeToLive);
 
         return Task.CompletedTask;
     }
 
     public Task RemoveAsync(Guid movieId)
     {
-        _memoryCache.Remove(KeyFor(movieId));
+        _memoryCache.Remove(MovieCacheEntry.KeyFor(movieId));
 
         return Task.CompletedTask;
     }
-
-    private static string KeyFor(Guid movieId) => $"movie:{movieId}";
 }

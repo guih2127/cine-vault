@@ -20,8 +20,7 @@ public static class DependencyInjection
         services.AddScoped<IMovieRepository, MovieRepository>();
         services.AddScoped<IMovieReviewRepository, MovieReviewRepository>();
 
-        services.AddMemoryCache();
-        services.AddSingleton<IMovieCache, MemoryMovieCache>();
+        AddMovieCache(services, configuration);
 
         services.AddSingleton<IPasswordHasher, PasswordHasherAdapter>();
 
@@ -30,5 +29,24 @@ public static class DependencyInjection
         services.AddSingleton<ITokenService, JwtTokenService>();
 
         return services;
+    }
+
+    private static void AddMovieCache(IServiceCollection services, IConfiguration configuration)
+    {
+        var redisConnectionString = configuration.GetConnectionString("Redis");
+
+        if (string.IsNullOrWhiteSpace(redisConnectionString))
+        {
+            services.AddMemoryCache();
+            services.AddSingleton<IMovieCache, MemoryMovieCache>();
+            return;
+        }
+
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = redisConnectionString;
+            options.InstanceName = "cinevault:";
+        });
+        services.AddSingleton<IMovieCache, RedisMovieCache>();
     }
 }

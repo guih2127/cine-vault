@@ -43,4 +43,42 @@ public class MovieRepositoryTests : RepositoryTestBase
 
         exists.Should().BeFalse();
     }
+
+    [Fact]
+    public async Task GetByIdAsync_WhenMovieExists_ReturnsMovie()
+    {
+        var movie = Movie.Create("The Matrix", 1999, null);
+        var arrange = CreateContext();
+        arrange.Movies.Add(movie);
+        await arrange.SaveChangesAsync();
+
+        var found = await _repository.GetByIdAsync(movie.Id);
+
+        found.Should().NotBeNull();
+        found!.Title.Should().Be("The Matrix");
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_WhenMovieMissing_ReturnsNull()
+    {
+        var found = await _repository.GetByIdAsync(Guid.NewGuid());
+
+        found.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task UpdateAsync_PersistsChanges()
+    {
+        var movie = Movie.Create("The Matrix", 1999, null);
+        var arrange = CreateContext();
+        arrange.Movies.Add(movie);
+        await arrange.SaveChangesAsync();
+
+        var loaded = await _repository.GetByIdAsync(movie.Id);
+        loaded!.Rename("The Matrix Reloaded");
+        await _repository.UpdateAsync(loaded);
+
+        var persisted = await CreateContext().Movies.FindAsync(movie.Id);
+        persisted!.Title.Should().Be("The Matrix Reloaded");
+    }
 }

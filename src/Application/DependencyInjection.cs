@@ -1,4 +1,6 @@
+using CineVault.Application.Movies.GetMovieById;
 using CineVault.Application.Movies.ListMovies;
+using CineVault.Application.Movies.RenameMovie;
 using CineVault.Application.MovieReviews.CreateMovieReview;
 using CineVault.Application.MovieReviews.DeleteMovieReview;
 using CineVault.Application.MovieReviews.ListMovieReviews;
@@ -20,6 +22,8 @@ public static class DependencyInjection
         services.AddScoped<DeleteMovieReviewUseCase>();
         services.AddScoped<ListMovieReviewsUseCase>();
         services.AddScoped<ListMoviesUseCase>();
+        services.AddScoped<GetMovieByIdUseCase>();
+        services.AddScoped<RenameMovieUseCase>();
 
         return services;
     }

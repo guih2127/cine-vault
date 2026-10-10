@@ -28,4 +28,29 @@ public class MovieTests
         act.Should().Throw<DomainException>()
             .WithMessage("*title*");
     }
+
+    [Fact]
+    public void Rename_WithValidTitle_UpdatesTrimmedTitle()
+    {
+        var movie = Movie.Create("The Matrix", 1999, null);
+
+        movie.Rename("  The Matrix Reloaded  ");
+
+        movie.Title.Should().Be("The Matrix Reloaded");
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData(null)]
+    public void Rename_WithEmptyTitle_ThrowsDomainExceptionAndKeepsTitle(string? invalidTitle)
+    {
+        var movie = Movie.Create("The Matrix", 1999, null);
+
+        var act = () => movie.Rename(invalidTitle!);
+
+        act.Should().Throw<DomainException>()
+            .WithMessage("*title*");
+        movie.Title.Should().Be("The Matrix");
+    }
 }

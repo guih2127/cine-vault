@@ -19,11 +19,22 @@ public class Movie
 
     public static Movie Create(string title, int year, string? posterUrl)
     {
+        EnsureValidTitle(title);
+
+        return new Movie(Guid.NewGuid(), title.Trim(), year, posterUrl);
+    }
+
+    public void Rename(string title)
+    {
+        EnsureValidTitle(title);
+        Title = title.Trim();
+    }
+
+    private static void EnsureValidTitle(string title)
+    {
         if (string.IsNullOrWhiteSpace(title))
         {
             throw new DomainException("Movie title is required.");
         }
-
-        return new Movie(Guid.NewGuid(), title.Trim(), year, posterUrl);
     }
 }
